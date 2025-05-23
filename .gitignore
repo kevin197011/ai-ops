@@ -1,0 +1,38 @@
+# 编译后的二进制文件
+ai-ops
+ai-ops.exe
+
+# Go 模块缓存
+vendor/
+
+# IDE 文件
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 日志文件
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 配置文件 (如果包含敏感信息)
+config/local.yaml
+config/production.yaml
+
+# 临时文件
+tmp/
+temp/
+
+# 数据库文件
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# 测试覆盖率
+coverage.out
+coverage.html
