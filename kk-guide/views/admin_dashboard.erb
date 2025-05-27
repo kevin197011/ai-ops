@@ -1,0 +1,197 @@
+<div class="space-y-6">
+  <div>
+    <h1 class="text-3xl font-bold bg-gradient-to-r from-tech to-accent bg-clip-text text-transparent">
+      运维管理仪表板
+    </h1>
+    <p class="text-gray-600 mt-2">系统概览和快速操作</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-gradient-to-br from-tech/10 to-tech/20 rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6 text-tech" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">分类总数</p>
+          <p class="text-2xl font-bold text-gray-800"><%= @categories.length %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-gradient-to-br from-accent/10 to-accent/20 rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">链接总数</p>
+          <p class="text-2xl font-bold text-gray-800">
+            <%= @categories.sum { |cat| cat[:links].length } %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-gradient-to-br from-success/10 to-success/20 rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">活跃链接</p>
+          <p class="text-2xl font-bold text-gray-800">
+            <%= @categories.sum { |cat| cat[:links].length } %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-300">
+      <div class="flex items-center">
+        <div class="w-12 h-12 bg-gradient-to-br from-warning/10 to-warning/20 rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-gray-600">系统状态</p>
+          <p class="text-sm font-bold text-success">正常运行</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+    <div class="p-6 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-tech" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        快速操作
+      </h3>
+    </div>
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <a href="/admin/categories" class="group block p-4 bg-gray-50 border border-gray-200 rounded-lg hover:border-tech hover:shadow-md transition-all duration-300">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-tech/10 to-tech/20 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-tech" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium text-gray-800 group-hover:text-tech transition-colors">
+                添加分类
+              </h4>
+              <p class="text-xs text-gray-600">创建新的导航分类</p>
+            </div>
+          </div>
+        </a>
+
+        <a href="/admin/links" class="group block p-4 bg-gray-50 border border-gray-200 rounded-lg hover:border-accent hover:shadow-md transition-all duration-300">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-accent/10 to-accent/20 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium text-gray-800 group-hover:text-accent transition-colors">
+                添加链接
+              </h4>
+              <p class="text-xs text-gray-600">添加新的导航链接</p>
+            </div>
+          </div>
+        </a>
+
+        <a href="/" target="_blank" class="group block p-4 bg-gray-50 border border-gray-200 rounded-lg hover:border-warning hover:shadow-md transition-all duration-300">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-warning/10 to-warning/20 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium text-gray-800 group-hover:text-warning transition-colors">
+                预览前台
+              </h4>
+              <p class="text-xs text-gray-600">查看前台显示效果</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categories Overview -->
+  <% if @categories && @categories.any? %>
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+      <div class="p-6 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-tech" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          分类概览
+        </h3>
+      </div>
+      <div class="p-6">
+        <div class="space-y-4">
+          <% @categories.each do |category| %>
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-gradient-to-br from-tech/10 to-accent/10 rounded-lg flex items-center justify-center">
+                  <svg class="w-4 h-4 text-tech" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="text-sm font-medium text-gray-800"><%= category[:name] %></h4>
+                  <% if category[:description] && !category[:description].empty? %>
+                    <p class="text-xs text-gray-600"><%= category[:description] %></p>
+                  <% end %>
+                </div>
+              </div>
+              <div class="flex items-center space-x-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-tech/10 text-tech">
+                  <%= category[:links].length %> 个链接
+                </span>
+                <a href="/admin/categories" class="text-gray-500 hover:text-tech transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+      <div class="p-8 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-full flex items-center justify-center border border-gray-200">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-700 mb-2">暂无分类</h3>
+        <p class="text-gray-600 mb-4">开始创建您的第一个导航分类</p>
+        <a href="/admin/categories" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-tech to-accent text-white text-sm font-medium rounded-lg hover:from-tech/90 hover:to-accent/90 transition-all duration-200 shadow-md hover:shadow-lg">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+          </svg>
+          创建分类
+        </a>
+      </div>
+    </div>
+  <% end %>
+</div>

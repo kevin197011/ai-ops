@@ -1,0 +1,662 @@
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold bg-gradient-to-r from-tech to-accent bg-clip-text text-transparent">链接管理</h1>
+    <p class="text-gray-600">管理导航链接</p>
+  </div>
+
+  <!-- Add Link Form -->
+  <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+    <div class="p-6 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-tech" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        添加新链接
+      </h3>
+    </div>
+    <div class="p-6">
+      <form id="addLinkForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="title" class="block text-sm font-medium text-gray-700 mb-2">链接标题</label>
+            <input type="text" name="title" id="title" required
+                   class="block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200"
+                   placeholder="例如：Prometheus">
+          </div>
+          <div>
+            <label for="url" class="block text-sm font-medium text-gray-700 mb-2">链接地址</label>
+            <input type="url" name="url" id="url" required
+                   class="block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200"
+                   placeholder="https://example.com">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label for="category_id" class="block text-sm font-medium text-gray-700 mb-2">所属分类</label>
+            <select name="category_id" id="category_id" required
+                    class="block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200">
+              <option value="">选择分类</option>
+              <% @categories.each do |category| %>
+                <option value="<%= category[0] %>"><%= category[1] %></option>
+              <% end %>
+            </select>
+          </div>
+          <div>
+            <label for="icon" class="block text-sm font-medium text-gray-700 mb-2">图标 (Emoji)</label>
+            <div class="flex items-center space-x-2">
+              <input type="text" name="icon" id="icon"
+                     class="block w-20 px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200"
+                     placeholder="📊" maxlength="2">
+              <button type="button" onclick="showEmojiPicker()"
+                      class="inline-flex items-center px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 hover:text-tech hover:border-tech transition-all duration-200">
+                选择图标
+              </button>
+            </div>
+
+            <!-- Emoji Picker -->
+            <div id="emojiPicker" class="hidden mt-2 p-3 bg-white border border-gray-300 rounded-lg shadow-lg">
+              <div class="text-sm font-medium text-gray-700 mb-2">常用图标:</div>
+              <div class="grid grid-cols-8 gap-2">
+                <!-- 监控类 -->
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📊')">📊</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📈')">📈</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📉')">📉</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📋')">📋</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('⚡')">⚡</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🔍')">🔍</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('👁️')">👁️</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🎯')">🎯</button>
+
+                <!-- 工具类 -->
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🔧')">🔧</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('⚙️')">⚙️</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🛠️')">🛠️</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🔨')">🔨</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('⚒️')">⚒️</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🔩')">🔩</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('⛏️')">⛏️</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🪛')">🪛</button>
+
+                <!-- 容器和部署 -->
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🐳')">🐳</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🚀')">🚀</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📦')">📦</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🎁')">🎁</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📤')">📤</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📥')">📥</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🏗️')">🏗️</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🏭')">🏭</button>
+
+                <!-- 服务器和网络 -->
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🖥️')">🖥️</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('💻')">💻</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🖨️')">🖨️</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🌐')">🌐</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🔗')">🔗</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📡')">📡</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🌍')">🌍</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🌎')">🌎</button>
+
+                <!-- 安全类 -->
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🔒')">🔒</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🔓')">🔓</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🛡️')">🛡️</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🔐')">🔐</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🗝️')">🗝️</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🔑')">🔑</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('⚠️')">⚠️</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🚨')">🚨</button>
+
+                <!-- 数据和文档 -->
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📄')">📄</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📃')">📃</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📑')">📑</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📝')">📝</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📁')">📁</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('📂')">📂</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🗂️')">🗂️</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🗃️')">🗃️</button>
+
+                <!-- 状态和指示 -->
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('✅')">✅</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('❌')">❌</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🟢')">🟢</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🔴')">🔴</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🟡')">🟡</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🟠')">🟠</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('💡')">💡</button>
+                <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEmoji('🔥')">🔥</button>
+              </div>
+
+              <div class="mt-3 pt-2 border-t border-gray-200">
+                <button type="button" onclick="hideEmojiPicker()"
+                        class="text-sm text-gray-600 hover:text-tech transition-colors">关闭</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label for="sort_order" class="block text-sm font-medium text-gray-700 mb-2">排序</label>
+            <input type="number" name="sort_order" id="sort_order" value="0"
+                   class="block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200">
+          </div>
+        </div>
+
+        <div>
+          <label for="description" class="block text-sm font-medium text-gray-700 mb-2">描述</label>
+          <textarea name="description" id="description" rows="3"
+                    class="block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200"
+                    placeholder="链接的简短描述"></textarea>
+        </div>
+
+        <div>
+          <button type="submit"
+                  class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-accent to-tech text-white text-sm font-medium rounded-lg hover:from-accent/90 hover:to-tech/90 transition-all duration-200 shadow-md hover:shadow-lg">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            添加链接
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Links List -->
+  <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+    <div class="p-6 border-b border-gray-200">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+        <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-tech" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+          </svg>
+          现有链接
+        </h3>
+
+        <!-- Category Filter -->
+        <div class="flex items-center space-x-2">
+          <label for="categoryFilter" class="text-sm font-medium text-gray-700">按分类过滤:</label>
+          <select id="categoryFilter" onchange="filterByCategory()"
+                  class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200">
+            <option value="">全部分类</option>
+            <% @categories.each do |category| %>
+              <option value="<%= category[1] %>"><%= category[1] %></option>
+            <% end %>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="p-6">
+      <% if @links && @links.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full">
+            <thead>
+              <tr class="border-b border-gray-200">
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  标题
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  链接
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  分类
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  状态
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  排序
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  操作
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <% @links.each do |link| %>
+                <!-- Normal view row -->
+                <tr class="hover:bg-gray-50 transition-colors link-row link-row-<%= link[0] %>" data-category="<%= link[9] || '无分类' %>">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 bg-gradient-to-br from-tech/10 to-accent/10 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-lg"><%= link[5] || '🔗' %></span>
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium text-gray-800"><%= link[1] %></div>
+                        <% if link[3] && !link[3].empty? %>
+                          <div class="text-sm text-gray-600 max-w-xs truncate"><%= link[3] %></div>
+                        <% end %>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <a href="<%= link[2] %>" target="_blank" class="text-tech hover:text-accent text-sm max-w-xs truncate block transition-colors">
+                      <%= link[2] %>
+                    </a>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-tech/10 text-tech">
+                      <%= link[9] || '无分类' %>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% if link[7] == 1 %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        活跃
+                      </span>
+                    <% else %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        禁用
+                      </span>
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-600"><%= link[6] %></div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div class="flex items-center space-x-2">
+                      <button onclick="editLink(<%= link[0] %>, '<%= link[1].gsub("'", "\\'") %>', '<%= link[2].gsub("'", "\\'") %>', '<%= (link[3] || '').gsub("'", "\\'") %>', '<%= (link[5] || '').gsub("'", "\\'") %>', <%= link[6] %>, <%= link[4] %>)"
+                              class="text-blue-600 hover:text-blue-700 transition-colors"
+                              title="编辑链接">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                      </button>
+                      <button onclick="toggleLink(<%= link[0] %>)"
+                              class="<%= link[7] == 1 ? 'text-orange-600 hover:text-orange-700' : 'text-green-600 hover:text-green-700' %> transition-colors"
+                              title="<%= link[7] == 1 ? '禁用链接' : '启用链接' %>">
+                        <% if link[7] == 1 %>
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636 5.636 18.364"/>
+                          </svg>
+                        <% else %>
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          </svg>
+                        <% end %>
+                      </button>
+                      <button onclick="confirmDelete(<%= link[0] %>, 'link', '<%= link[1] %>')"
+                              class="text-red-600 hover:text-red-700 transition-colors"
+                              title="删除链接">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Edit form row (hidden by default) -->
+                <tr class="hidden edit-link-row-<%= link[0] %> bg-blue-50" data-category="<%= link[9] || '无分类' %>">
+                  <td colspan="6" class="px-6 py-4">
+                    <form onsubmit="updateLink(event, <%= link[0] %>)" class="space-y-4">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">链接标题</label>
+                          <input type="text" id="edit-link-title-<%= link[0] %>" required
+                                 class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">链接地址</label>
+                          <input type="url" id="edit-link-url-<%= link[0] %>" required
+                                 class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech">
+                        </div>
+                      </div>
+
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">所属分类</label>
+                          <select id="edit-link-category-<%= link[0] %>" required
+                                  class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech">
+                            <option value="">选择分类</option>
+                            <% @categories.each do |category| %>
+                              <option value="<%= category[0] %>"><%= category[1] %></option>
+                            <% end %>
+                          </select>
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">图标 (Emoji)</label>
+                          <div class="flex items-center space-x-2">
+                            <input type="text" id="edit-link-icon-<%= link[0] %>" maxlength="2"
+                                   class="block w-20 px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech">
+                            <button type="button" onclick="showEditEmojiPicker(<%= link[0] %>)"
+                                    class="inline-flex items-center px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 hover:text-tech hover:border-tech transition-all duration-200 text-sm">
+                              选择图标
+                            </button>
+                          </div>
+
+                          <!-- Edit Emoji Picker -->
+                          <div id="editEmojiPicker-<%= link[0] %>" class="hidden mt-2 p-3 bg-white border border-gray-300 rounded-lg shadow-lg">
+                            <div class="text-sm font-medium text-gray-700 mb-2">常用图标:</div>
+                            <div class="grid grid-cols-8 gap-2">
+                              <!-- 监控类 -->
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📊')">📊</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📈')">📈</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📉')">📉</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📋')">📋</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '⚡')">⚡</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🔍')">🔍</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '👁️')">👁️</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🎯')">🎯</button>
+
+                              <!-- 工具类 -->
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🔧')">🔧</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '⚙️')">⚙️</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🛠️')">🛠️</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🔨')">🔨</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '⚒️')">⚒️</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🔩')">🔩</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '⛏️')">⛏️</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🪛')">🪛</button>
+
+                              <!-- 容器和部署 -->
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🐳')">🐳</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🚀')">🚀</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📦')">📦</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🎁')">🎁</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📤')">📤</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📥')">📥</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🏗️')">🏗️</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🏭')">🏭</button>
+
+                              <!-- 服务器和网络 -->
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🖥️')">🖥️</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '💻')">💻</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🖨️')">🖨️</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🌐')">🌐</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🔗')">🔗</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📡')">📡</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🌍')">🌍</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🌎')">🌎</button>
+
+                              <!-- 安全类 -->
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🔒')">🔒</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🔓')">🔓</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🛡️')">🛡️</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🔐')">🔐</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🗝️')">🗝️</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🔑')">🔑</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '⚠️')">⚠️</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🚨')">🚨</button>
+
+                              <!-- 数据和文档 -->
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📄')">📄</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📃')">📃</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📑')">📑</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📝')">📝</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📁')">📁</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '📂')">📂</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🗂️')">🗂️</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🗃️')">🗃️</button>
+
+                              <!-- 状态和指示 -->
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '✅')">✅</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '❌')">❌</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🟢')">🟢</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🔴')">🔴</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🟡')">🟡</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🟠')">🟠</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '💡')">💡</button>
+                              <button type="button" class="emoji-btn p-2 text-lg hover:bg-gray-100 rounded transition-colors" onclick="selectEditEmoji(<%= link[0] %>, '🔥')">🔥</button>
+                            </div>
+
+                            <div class="mt-3 pt-2 border-t border-gray-200">
+                              <button type="button" onclick="hideEditEmojiPicker(<%= link[0] %>)"
+                                      class="text-sm text-gray-600 hover:text-tech transition-colors">关闭</button>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">排序</label>
+                          <input type="number" id="edit-link-sort-<%= link[0] %>"
+                                 class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech">
+                        </div>
+                      </div>
+
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                        <textarea id="edit-link-description-<%= link[0] %>" rows="2"
+                                  class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech"></textarea>
+                      </div>
+
+                      <div class="flex items-center space-x-2">
+                        <button type="submit"
+                                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-tech to-accent text-white text-sm font-medium rounded-lg hover:from-tech/90 hover:to-accent/90 transition-all duration-200">
+                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                          </svg>
+                          保存
+                        </button>
+                        <button type="button" onclick="cancelLinkEdit(<%= link[0] %>)"
+                                class="inline-flex items-center px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded-lg hover:bg-gray-600 transition-all duration-200">
+                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                          </svg>
+                          取消
+                        </button>
+                      </div>
+                    </form>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- No results message (hidden by default) -->
+        <div id="noResultsMessage" class="hidden text-center py-12">
+          <div class="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-full flex items-center justify-center border border-gray-200">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-700 mb-2">未找到匹配的链接</h3>
+          <p class="text-gray-600">当前分类下没有链接，请尝试选择其他分类</p>
+        </div>
+      <% else %>
+        <div class="text-center py-12">
+          <div class="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-full flex items-center justify-center border border-gray-200">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-700 mb-2">没有链接</h3>
+          <p class="text-gray-600 mb-4">开始添加您的第一个导航链接</p>
+          <% if @categories.empty? %>
+            <div class="mt-6">
+              <a href="/admin/categories" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-tech to-accent text-white text-sm font-medium rounded-lg hover:from-tech/90 hover:to-accent/90 transition-all duration-200 shadow-md hover:shadow-lg">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                先添加分类
+              </a>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Add link form submission
+  document.getElementById('addLinkForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(this);
+    const title = formData.get('title');
+    const url = formData.get('url');
+    const description = formData.get('description');
+    const icon = formData.get('icon');
+    const sortOrder = formData.get('sort_order');
+    const categoryId = formData.get('category_id');
+
+    // Show loading notification
+    showNotification('正在添加链接...', 'warning');
+
+    fetch('/admin/links', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        title: title,
+        url: url,
+        description: description,
+        icon: icon,
+        sort_order: sortOrder,
+        category_id: categoryId
+      })
+    })
+    .then(response => {
+      if (response.redirected) {
+        // Traditional form submission was successful
+        showNotification('链接添加成功！', 'success');
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      } else {
+        return response.json();
+      }
+    })
+    .then(data => {
+      if (data && data.success) {
+        showNotification('链接添加成功！', 'success');
+        // Reset form
+        document.getElementById('addLinkForm').reset();
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      } else if (data && !data.success) {
+        showNotification('添加失败，请重试', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showNotification('添加失败，请重试', 'error');
+    });
+  });
+
+  // Category filter function
+  function filterByCategory() {
+    const filterValue = document.getElementById('categoryFilter').value;
+    const rows = document.querySelectorAll('.link-row');
+    const editRows = document.querySelectorAll('[class*="edit-link-row-"]');
+    const table = document.querySelector('table');
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    let visibleCount = 0;
+
+    // Filter normal rows
+    rows.forEach(row => {
+      const category = row.getAttribute('data-category');
+      if (filterValue === '' || category === filterValue) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    // Filter edit rows
+    editRows.forEach(row => {
+      const category = row.getAttribute('data-category');
+      if (filterValue === '' || category === filterValue) {
+        // Keep edit row visibility as is (controlled by edit state)
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    // Show/hide no results message
+    if (visibleCount === 0 && filterValue !== '') {
+      table.style.display = 'none';
+      noResultsMessage.classList.remove('hidden');
+    } else {
+      table.style.display = '';
+      noResultsMessage.classList.add('hidden');
+    }
+  }
+
+  // Edit link function
+  function editLink(id, title, url, description, icon, sortOrder, categoryId) {
+    // Hide normal row and show edit row
+    document.querySelector('.link-row-' + id).classList.add('hidden');
+    document.querySelector('.edit-link-row-' + id).classList.remove('hidden');
+
+    // Fill form with current values
+    document.getElementById('edit-link-title-' + id).value = title;
+    document.getElementById('edit-link-url-' + id).value = url;
+    document.getElementById('edit-link-description-' + id).value = description || '';
+    document.getElementById('edit-link-icon-' + id).value = icon || '';
+    document.getElementById('edit-link-sort-' + id).value = sortOrder;
+    document.getElementById('edit-link-category-' + id).value = categoryId;
+  }
+
+  // Cancel link edit function
+  function cancelLinkEdit(id) {
+    // Show normal row and hide edit row
+    document.querySelector('.link-row-' + id).classList.remove('hidden');
+    document.querySelector('.edit-link-row-' + id).classList.add('hidden');
+  }
+
+  // Update link function
+  function updateLink(event, id) {
+    event.preventDefault();
+
+    const title = document.getElementById('edit-link-title-' + id).value;
+    const url = document.getElementById('edit-link-url-' + id).value;
+    const description = document.getElementById('edit-link-description-' + id).value;
+    const icon = document.getElementById('edit-link-icon-' + id).value;
+    const sortOrder = document.getElementById('edit-link-sort-' + id).value;
+    const categoryId = document.getElementById('edit-link-category-' + id).value;
+
+    // Show loading notification
+    showNotification('正在更新链接...', 'warning');
+
+    fetch(`/admin/links/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        title: title,
+        url: url,
+        description: description,
+        icon: icon,
+        sort_order: sortOrder,
+        category_id: categoryId
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showNotification('链接更新成功！', 'success');
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      } else {
+        showNotification('更新失败，请重试', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showNotification('更新失败，请重试', 'error');
+    });
+  }
+
+  // Edit emoji picker functions
+  function showEditEmojiPicker(linkId) {
+    document.getElementById('editEmojiPicker-' + linkId).classList.remove('hidden');
+  }
+
+  function hideEditEmojiPicker(linkId) {
+    document.getElementById('editEmojiPicker-' + linkId).classList.add('hidden');
+  }
+
+  function selectEditEmoji(linkId, emoji) {
+    document.getElementById('edit-link-icon-' + linkId).value = emoji;
+    hideEditEmojiPicker(linkId);
+  }
+</script>

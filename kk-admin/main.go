@@ -49,7 +49,7 @@ func main() {
 
 	r.GET("/hosts", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "hosts.html", gin.H{
-			"title": "主机管理",
+			"title": "智能运维管理平台",
 		})
 	})
 

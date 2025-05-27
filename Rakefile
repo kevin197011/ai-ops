@@ -15,3 +15,7 @@ task :push do
   system 'git pull'
   system 'git push origin main'
 end
+
+task :run do
+  system 'go run main.go'
+end

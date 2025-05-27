@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>运维导航系统</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0EA5E9',
+            secondary: '#F8FAFC',
+            accent: '#10B981',
+            light: '#F1F5F9',
+            lighter: '#FFFFFF',
+            tech: '#0EA5E9',
+            success: '#10B981',
+            warning: '#F59E0B',
+            danger: '#EF4444',
+          },
+          backgroundImage: {
+            'tech-gradient': 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 50%, #E2E8F0 100%)',
+            'card-gradient': 'linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .tech-glow {
+      box-shadow: 0 0 20px rgba(14, 165, 233, 0.2);
+    }
+    .tech-border {
+      border: 1px solid rgba(14, 165, 233, 0.2);
+    }
+    .tech-hover:hover {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+      border-color: rgba(14, 165, 233, 0.3);
+      transform: translateY(-2px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+    }
+  </style>
+</head>
+<body class="bg-tech-gradient min-h-screen text-gray-800">
+  <header class="bg-white/95 backdrop-blur-sm shadow-lg border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-tech to-accent rounded-lg flex items-center justify-center tech-glow">
+            <span class="text-xl">🚀</span>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-tech to-accent bg-clip-text text-transparent">
+              运维导航系统
+            </h1>
+            <p class="text-xs text-gray-500">Operations Management Portal</p>
+          </div>
+        </div>
+        <nav class="hidden md:flex space-x-6">
+          <a href="/" class="text-gray-600 hover:text-tech transition-colors duration-200 flex items-center space-x-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+            </svg>
+            <span>首页</span>
+          </a>
+          <a href="/admin" class="text-gray-600 hover:text-accent transition-colors duration-200 flex items-center space-x-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span>管理后台</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <%= yield %>
+  </main>
+
+  <footer class="bg-white/90 backdrop-blur-sm border-t border-gray-200 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <p class="text-gray-600 text-sm">
+          © 2025 运维导航系统 | Built with
+          <span class="text-tech font-medium">Ruby Sinatra</span> &
+          <span class="text-accent font-medium">Tailwind CSS</span>
+        </p>
+        <div class="flex items-center space-x-4 mt-2 md:mt-0">
+          <div class="flex items-center space-x-1 text-xs text-gray-500">
+            <div class="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+            <span>系统运行正常</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold bg-gradient-to-r from-tech to-accent bg-clip-text text-transparent">
+      分类管理
+    </h1>
+    <p class="text-gray-600">管理导航分类</p>
+  </div>
+
+  <!-- Add Category Form -->
+  <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+    <div class="p-6 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-tech" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        添加新分类
+      </h3>
+    </div>
+    <div class="p-6">
+      <form id="addCategoryForm" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">分类名称</label>
+            <input type="text" name="name" id="name" required
+                   class="block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200"
+                   placeholder="例如：监控系统">
+          </div>
+          <div>
+            <label for="sort_order" class="block text-sm font-medium text-gray-700 mb-2">排序</label>
+            <input type="number" name="sort_order" id="sort_order" value="0"
+                   class="block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200">
+          </div>
+        </div>
+
+        <div>
+          <label for="description" class="block text-sm font-medium text-gray-700 mb-2">描述</label>
+          <textarea name="description" id="description" rows="3"
+                    class="block w-full px-3 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200"
+                    placeholder="分类的简短描述"></textarea>
+        </div>
+
+        <div>
+          <button type="submit"
+                  class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-tech to-accent text-white text-sm font-medium rounded-lg hover:from-tech/90 hover:to-accent/90 transition-all duration-200 shadow-md hover:shadow-lg">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            添加分类
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Categories List -->
+  <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+    <div class="p-6 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+        <svg class="w-5 h-5 mr-2 text-tech" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+        </svg>
+        现有分类
+      </h3>
+    </div>
+    <div class="p-6">
+      <% if @categories && @categories.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full">
+            <thead>
+              <tr class="border-b border-gray-200">
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  名称
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  描述
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  排序
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  创建时间
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  操作
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <% @categories.each do |category| %>
+                <!-- Normal view row -->
+                <tr class="hover:bg-gray-50 transition-colors category-row-<%= category[0] %>">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-8 h-8 bg-gradient-to-br from-tech/10 to-accent/10 rounded-lg flex items-center justify-center mr-3">
+                        <svg class="w-4 h-4 text-tech" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                      </div>
+                      <div class="text-sm font-medium text-gray-800"><%= category[1] %></div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="text-sm text-gray-600 max-w-xs">
+                      <%= category[2] || '无描述' %>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-tech/10 text-tech">
+                      <%= category[3] %>
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-500">
+                      <%= category[4] ? Time.parse(category[4]).strftime('%Y-%m-%d %H:%M') : '未知' %>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div class="flex items-center space-x-2">
+                      <button onclick="editCategory(<%= category[0] %>, '<%= category[1].gsub("'", "\\'") %>', '<%= (category[2] || '').gsub("'", "\\'") %>', <%= category[3] %>)"
+                              class="text-blue-600 hover:text-blue-700 transition-colors"
+                              title="编辑分类">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                      </button>
+                      <button onclick="confirmDelete(<%= category[0] %>, 'category', '<%= category[1] %>')"
+                              class="text-red-600 hover:text-red-700 transition-colors"
+                              title="删除分类">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Edit form row (hidden by default) -->
+                <tr class="hidden edit-row-<%= category[0] %> bg-blue-50">
+                  <td colspan="5" class="px-6 py-4">
+                    <form onsubmit="updateCategory(event, <%= category[0] %>)" class="space-y-4">
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">分类名称</label>
+                          <input type="text" id="edit-name-<%= category[0] %>" required
+                                 class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">排序</label>
+                          <input type="number" id="edit-sort-<%= category[0] %>"
+                                 class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                          <input type="text" id="edit-description-<%= category[0] %>"
+                                 class="block w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech">
+                        </div>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <button type="submit"
+                                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-tech to-accent text-white text-sm font-medium rounded-lg hover:from-tech/90 hover:to-accent/90 transition-all duration-200">
+                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                          </svg>
+                          保存
+                        </button>
+                        <button type="button" onclick="cancelEdit(<%= category[0] %>)"
+                                class="inline-flex items-center px-4 py-2 bg-gray-500 text-white text-sm font-medium rounded-lg hover:bg-gray-600 transition-all duration-200">
+                          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                          </svg>
+                          取消
+                        </button>
+                      </div>
+                    </form>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="text-center py-12">
+          <div class="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-full flex items-center justify-center border border-gray-200">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-700 mb-2">没有分类</h3>
+          <p class="text-gray-600">开始添加您的第一个导航分类</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Add category form submission
+  document.getElementById('addCategoryForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(this);
+    const name = formData.get('name');
+    const description = formData.get('description');
+    const sortOrder = formData.get('sort_order');
+
+    // Show loading notification
+    showNotification('正在添加分类...', 'warning');
+
+    fetch('/admin/categories', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        name: name,
+        description: description,
+        sort_order: sortOrder
+      })
+    })
+    .then(response => {
+      if (response.redirected) {
+        // Traditional form submission was successful
+        showNotification('分类添加成功！', 'success');
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      } else {
+        return response.json();
+      }
+    })
+    .then(data => {
+      if (data && data.success) {
+        showNotification('分类添加成功！', 'success');
+        // Reset form
+        document.getElementById('addCategoryForm').reset();
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      } else if (data && !data.success) {
+        showNotification('添加失败，请重试', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showNotification('添加失败，请重试', 'error');
+    });
+  });
+
+  // Edit category function
+  function editCategory(id, name, description, sortOrder) {
+    // Hide normal row and show edit row
+    document.querySelector('.category-row-' + id).classList.add('hidden');
+    document.querySelector('.edit-row-' + id).classList.remove('hidden');
+
+    // Fill form with current values
+    document.getElementById('edit-name-' + id).value = name;
+    document.getElementById('edit-description-' + id).value = description || '';
+    document.getElementById('edit-sort-' + id).value = sortOrder;
+  }
+
+  // Cancel edit function
+  function cancelEdit(id) {
+    // Show normal row and hide edit row
+    document.querySelector('.category-row-' + id).classList.remove('hidden');
+    document.querySelector('.edit-row-' + id).classList.add('hidden');
+  }
+
+  // Update category function
+  function updateCategory(event, id) {
+    event.preventDefault();
+
+    const name = document.getElementById('edit-name-' + id).value;
+    const description = document.getElementById('edit-description-' + id).value;
+    const sortOrder = document.getElementById('edit-sort-' + id).value;
+
+    // Show loading notification
+    showNotification('正在更新分类...', 'warning');
+
+    fetch(`/admin/categories/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        name: name,
+        description: description,
+        sort_order: sortOrder
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showNotification('分类更新成功！', 'success');
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      } else {
+        showNotification('更新失败，请重试', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showNotification('更新失败，请重试', 'error');
+    });
+  }
+</script>
