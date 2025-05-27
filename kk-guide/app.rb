@@ -216,6 +216,67 @@ get '/admin/dashboard' do
   erb :admin_dashboard, layout: :admin_layout
 end
 
+# Password change
+get '/admin/change-password' do
+  require_admin
+  @base_url = get_base_url
+  erb :admin_change_password, layout: :admin_layout
+end
+
+post '/admin/change-password' do
+  require_admin
+
+  current_password = params[:current_password]
+  new_password = params[:new_password]
+  confirm_password = params[:confirm_password]
+
+  # Validate input
+  if current_password.nil? || current_password.empty?
+    @error = '请输入当前密码'
+    @base_url = get_base_url
+    return erb :admin_change_password, layout: :admin_layout
+  end
+
+  if new_password.nil? || new_password.empty?
+    @error = '请输入新密码'
+    @base_url = get_base_url
+    return erb :admin_change_password, layout: :admin_layout
+  end
+
+  if new_password.length < 6
+    @error = '新密码长度至少6位'
+    @base_url = get_base_url
+    return erb :admin_change_password, layout: :admin_layout
+  end
+
+  if new_password != confirm_password
+    @error = '两次输入的新密码不一致'
+    @base_url = get_base_url
+    return erb :admin_change_password, layout: :admin_layout
+  end
+
+  # Verify current password
+  db = get_db
+  user = db.execute("SELECT * FROM admin_users WHERE username = ?", [session[:admin_username]]).first
+
+  if user.nil? || !BCrypt::Password.new(user[2]).is_password?(current_password)
+    @error = '当前密码错误'
+    @base_url = get_base_url
+    db.close
+    return erb :admin_change_password, layout: :admin_layout
+  end
+
+  # Update password
+  new_password_hash = BCrypt::Password.create(new_password)
+  db.execute("UPDATE admin_users SET password_hash = ? WHERE username = ?",
+             [new_password_hash, session[:admin_username]])
+  db.close
+
+  @success = '密码修改成功！'
+  @base_url = get_base_url
+  erb :admin_change_password, layout: :admin_layout
+end
+
 # Category management
 get '/admin/categories' do
   require_admin
