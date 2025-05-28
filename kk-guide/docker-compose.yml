@@ -2,6 +2,7 @@ services:
   navigation-app:
     build: .
     container_name: kk-navigation
+    user: root
     ports:
       - "4567:4567"
     volumes:
