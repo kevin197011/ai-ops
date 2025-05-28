@@ -174,15 +174,28 @@
         </h3>
 
         <!-- Category Filter -->
-        <div class="flex items-center space-x-2">
-          <label for="categoryFilter" class="text-sm font-medium text-gray-700">按分类过滤:</label>
-          <select id="categoryFilter" onchange="filterByCategory()"
-                  class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200">
-            <option value="">全部分类</option>
-            <% @categories.each do |category| %>
-              <option value="<%= category[1] %>"><%= category[1] %></option>
-            <% end %>
-          </select>
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-2">
+            <label for="categoryFilter" class="text-sm font-medium text-gray-700">按分类过滤:</label>
+            <select id="categoryFilter" onchange="filterByCategory()"
+                    class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200">
+              <option value="">全部分类</option>
+              <% @categories.each do |category| %>
+                <option value="<%= category[1] %>" <%= 'selected' if @pagination[:category_filter] == category[1] %>><%= category[1] %></option>
+              <% end %>
+            </select>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <label for="perPageSelect" class="text-sm font-medium text-gray-700">每页显示:</label>
+            <select id="perPageSelect" onchange="changePerPage()"
+                    class="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-tech focus:border-tech transition-all duration-200">
+              <option value="5" <%= 'selected' if @pagination[:per_page] == 5 %>>5条</option>
+              <option value="10" <%= 'selected' if @pagination[:per_page] == 10 %>>10条</option>
+              <option value="20" <%= 'selected' if @pagination[:per_page] == 20 %>>20条</option>
+              <option value="50" <%= 'selected' if @pagination[:per_page] == 50 %>>50条</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -443,16 +456,112 @@
           </table>
         </div>
 
-        <!-- No results message (hidden by default) -->
-        <div id="noResultsMessage" class="hidden text-center py-12">
-          <div class="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-full flex items-center justify-center border border-gray-200">
-            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
+        <!-- Pagination -->
+        <% if @links && @links.any? %>
+          <div class="mt-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            <!-- Pagination Info -->
+            <div class="text-sm text-gray-600">
+              显示第 <%= (@pagination[:current_page] - 1) * @pagination[:per_page] + 1 %> -
+              <%= [@pagination[:current_page] * @pagination[:per_page], @pagination[:total_count]].min %> 条，
+              共 <%= @pagination[:total_count] %> 条记录
+            </div>
+
+            <!-- Pagination Navigation -->
+            <% if @pagination[:total_pages] > 1 %>
+              <nav class="flex items-center space-x-1">
+                <!-- Previous Page -->
+                <% if @pagination[:has_prev] %>
+                  <a href="<%= build_pagination_url(@pagination[:prev_page]) %>"
+                     class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-tech transition-colors">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    上一页
+                  </a>
+                <% else %>
+                  <span class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 bg-gray-100 border border-gray-200 rounded-lg cursor-not-allowed">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    上一页
+                  </span>
+                <% end %>
+
+                <!-- Page Numbers -->
+                <div class="flex items-center space-x-1">
+                  <%
+                    # 计算显示的页码范围
+                    start_page = [@pagination[:current_page] - 2, 1].max
+                    end_page = [@pagination[:current_page] + 2, @pagination[:total_pages]].min
+
+                    # 如果页数不够5页，调整范围
+                    if end_page - start_page < 4
+                      if start_page == 1
+                        end_page = [start_page + 4, @pagination[:total_pages]].min
+                      else
+                        start_page = [end_page - 4, 1].max
+                      end
+                    end
+                  %>
+
+                  <!-- First page -->
+                  <% if start_page > 1 %>
+                    <a href="<%= build_pagination_url(1) %>"
+                       class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-tech transition-colors">
+                      1
+                    </a>
+                    <% if start_page > 2 %>
+                      <span class="inline-flex items-center px-2 py-2 text-sm font-medium text-gray-400">...</span>
+                    <% end %>
+                  <% end %>
+
+                  <!-- Page range -->
+                  <% (start_page..end_page).each do |page_num| %>
+                    <% if page_num == @pagination[:current_page] %>
+                      <span class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-tech border border-tech rounded-lg">
+                        <%= page_num %>
+                      </span>
+                    <% else %>
+                      <a href="<%= build_pagination_url(page_num) %>"
+                         class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-tech transition-colors">
+                        <%= page_num %>
+                      </a>
+                    <% end %>
+                  <% end %>
+
+                  <!-- Last page -->
+                  <% if end_page < @pagination[:total_pages] %>
+                    <% if end_page < @pagination[:total_pages] - 1 %>
+                      <span class="inline-flex items-center px-2 py-2 text-sm font-medium text-gray-400">...</span>
+                    <% end %>
+                    <a href="<%= build_pagination_url(@pagination[:total_pages]) %>"
+                       class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-tech transition-colors">
+                      <%= @pagination[:total_pages] %>
+                    </a>
+                  <% end %>
+                </div>
+
+                <!-- Next Page -->
+                <% if @pagination[:has_next] %>
+                  <a href="<%= build_pagination_url(@pagination[:next_page]) %>"
+                     class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-tech transition-colors">
+                    下一页
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </a>
+                <% else %>
+                  <span class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-300 bg-gray-100 border border-gray-200 rounded-lg cursor-not-allowed">
+                    下一页
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  </span>
+                <% end %>
+              </nav>
+            <% end %>
           </div>
-          <h3 class="text-lg font-medium text-gray-700 mb-2">未找到匹配的链接</h3>
-          <p class="text-gray-600">当前分类下没有链接，请尝试选择其他分类</p>
-        </div>
+        <% end %>
       <% else %>
         <div class="text-center py-12">
           <div class="w-16 h-16 mx-auto mb-4 bg-gray-50 rounded-full flex items-center justify-center border border-gray-200">
@@ -541,41 +650,32 @@
   // Category filter function
   function filterByCategory() {
     const filterValue = document.getElementById('categoryFilter').value;
-    const rows = document.querySelectorAll('.link-row');
-    const editRows = document.querySelectorAll('[class*="edit-link-row-"]');
-    const table = document.querySelector('table');
-    const noResultsMessage = document.getElementById('noResultsMessage');
-    let visibleCount = 0;
+    const currentPage = <%= @pagination[:current_page] %>;
+    const perPage = <%= @pagination[:per_page] %>;
 
-    // Filter normal rows
-    rows.forEach(row => {
-      const category = row.getAttribute('data-category');
-      if (filterValue === '' || category === filterValue) {
-        row.style.display = '';
-        visibleCount++;
-      } else {
-        row.style.display = 'none';
-      }
-    });
-
-    // Filter edit rows
-    editRows.forEach(row => {
-      const category = row.getAttribute('data-category');
-      if (filterValue === '' || category === filterValue) {
-        // Keep edit row visibility as is (controlled by edit state)
-      } else {
-        row.style.display = 'none';
-      }
-    });
-
-    // Show/hide no results message
-    if (visibleCount === 0 && filterValue !== '') {
-      table.style.display = 'none';
-      noResultsMessage.classList.remove('hidden');
-    } else {
-      table.style.display = '';
-      noResultsMessage.classList.add('hidden');
+    // 构建新的URL
+    let url = '/admin/links?page=1&per_page=' + perPage;
+    if (filterValue && filterValue !== '') {
+      url += '&category=' + encodeURIComponent(filterValue);
     }
+
+    // 重新加载页面
+    window.location.href = url;
+  }
+
+  // Change per page function
+  function changePerPage() {
+    const perPageValue = document.getElementById('perPageSelect').value;
+    const categoryFilter = document.getElementById('categoryFilter').value;
+
+    // 构建新的URL，重置到第一页
+    let url = '/admin/links?page=1&per_page=' + perPageValue;
+    if (categoryFilter && categoryFilter !== '') {
+      url += '&category=' + encodeURIComponent(categoryFilter);
+    }
+
+    // 重新加载页面
+    window.location.href = url;
   }
 
   // Edit link function

@@ -30,6 +30,21 @@
                 </svg>
               </button>
             </div>
+
+            <!-- 搜索建议下拉框 -->
+            <div id="searchSuggestions" class="hidden absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+              <div id="suggestionsLoading" class="hidden p-3 text-center text-gray-500 text-sm">
+                <svg class="animate-spin h-4 w-4 mx-auto mb-2" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                正在搜索...
+              </div>
+              <ul id="suggestionsList" class="py-1"></ul>
+              <div id="suggestionsEmpty" class="hidden p-3 text-center text-gray-500 text-sm">
+                没有找到匹配的结果
+              </div>
+            </div>
           </div>
         </div>
 
@@ -177,10 +192,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchStats = document.getElementById('searchStats');
     const filterStats = document.getElementById('filterStats');
 
+    // 搜索建议相关元素
+    const searchSuggestions = document.getElementById('searchSuggestions');
+    const suggestionsList = document.getElementById('suggestionsList');
+    const suggestionsLoading = document.getElementById('suggestionsLoading');
+    const suggestionsEmpty = document.getElementById('suggestionsEmpty');
+
     let totalLinks = 0;
     let visibleLinks = 0;
     let totalCategories = 0;
     let visibleCategories = 0;
+    let searchTimeout = null;
+    let selectedSuggestionIndex = -1;
+    let suggestions = [];
 
     // 计算总数
     function countTotals() {
@@ -213,6 +237,203 @@ document.addEventListener('DOMContentLoaded', function() {
             filterStats.classList.add('hidden');
             clearAllButton.classList.remove('hidden');
         }
+
+        // 获取搜索建议
+        debouncedFetchSuggestions(searchInput.value.trim());
+    }
+
+    // 获取搜索建议
+    async function fetchSuggestions(query) {
+        if (!query || query.trim().length < 1) {
+            hideSuggestions();
+            return;
+        }
+
+        // 显示加载状态
+        showSuggestionsLoading();
+
+        try {
+            const response = await fetch(`/api/search/suggestions?q=${encodeURIComponent(query.trim())}&limit=8`);
+            const data = await response.json();
+
+            suggestions = data.suggestions || [];
+            displaySuggestions(suggestions, query);
+        } catch (error) {
+            console.error('获取搜索建议失败:', error);
+            hideSuggestions();
+        }
+    }
+
+    // 显示搜索建议
+    function displaySuggestions(suggestions, query) {
+        hideSuggestionsLoading();
+
+        if (!suggestions || suggestions.length === 0) {
+            showSuggestionsEmpty();
+            return;
+        }
+
+        suggestionsList.innerHTML = '';
+        selectedSuggestionIndex = -1;
+
+        suggestions.forEach((suggestion, index) => {
+            const li = document.createElement('li');
+            li.className = 'suggestion-item px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0';
+            li.dataset.index = index;
+
+            // 高亮匹配的文本
+            const highlightedTitle = highlightMatch(suggestion.title, query);
+            const highlightedDesc = suggestion.description ? highlightMatch(suggestion.description, query) : '';
+
+            li.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-gradient-to-br from-tech/10 to-accent/10 rounded-lg flex items-center justify-center">
+                            <span class="text-sm">${suggestion.icon}</span>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm font-medium text-gray-800">${highlightedTitle}</span>
+                            ${suggestion.type === 'category' ?
+                                '<span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">分类</span>' :
+                                '<span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">工具</span>'
+                            }
+                        </div>
+                        ${highlightedDesc ? `<div class="text-xs text-gray-600 mt-1 truncate">${highlightedDesc}</div>` : ''}
+                        ${suggestion.category && suggestion.type === 'link' ?
+                            `<div class="text-xs text-gray-500 mt-1">分类：${suggestion.category}</div>` : ''
+                        }
+                    </div>
+                    ${suggestion.type === 'link' ? `
+                        <div class="flex-shrink-0">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            // 添加点击事件
+            li.addEventListener('click', () => selectSuggestion(suggestion));
+            li.addEventListener('mouseenter', () => {
+                selectedSuggestionIndex = index;
+                updateSuggestionSelection();
+            });
+
+            suggestionsList.appendChild(li);
+        });
+
+        showSuggestions();
+    }
+
+    // 选择建议
+    function selectSuggestion(suggestion) {
+        if (suggestion.type === 'link' && suggestion.url) {
+            // 如果是链接，直接打开
+            window.open(suggestion.url, '_blank');
+        } else {
+            // 如果是分类或其他，设置搜索词并执行搜索
+            searchInput.value = suggestion.title;
+            hideSuggestions();
+            performFilter();
+        }
+    }
+
+    // 更新建议选择状态
+    function updateSuggestionSelection() {
+        const items = suggestionsList.querySelectorAll('.suggestion-item');
+        items.forEach((item, index) => {
+            if (index === selectedSuggestionIndex) {
+                item.classList.add('bg-gray-100');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('bg-gray-100');
+            }
+        });
+    }
+
+    // 显示建议下拉框
+    function showSuggestions() {
+        searchSuggestions.classList.remove('hidden');
+        suggestionsEmpty.classList.add('hidden');
+        suggestionsLoading.classList.add('hidden');
+    }
+
+    // 隐藏建议下拉框
+    function hideSuggestions() {
+        searchSuggestions.classList.add('hidden');
+        selectedSuggestionIndex = -1;
+        suggestions = [];
+    }
+
+    // 显示加载状态
+    function showSuggestionsLoading() {
+        searchSuggestions.classList.remove('hidden');
+        suggestionsLoading.classList.remove('hidden');
+        suggestionsEmpty.classList.add('hidden');
+        suggestionsList.innerHTML = '';
+    }
+
+    // 隐藏加载状态
+    function hideSuggestionsLoading() {
+        suggestionsLoading.classList.add('hidden');
+    }
+
+    // 显示空结果
+    function showSuggestionsEmpty() {
+        searchSuggestions.classList.remove('hidden');
+        suggestionsEmpty.classList.remove('hidden');
+        suggestionsLoading.classList.add('hidden');
+        suggestionsList.innerHTML = '';
+    }
+
+    // 处理键盘导航
+    function handleSuggestionKeyboard(e) {
+        const isVisible = !searchSuggestions.classList.contains('hidden');
+
+        if (!isVisible || suggestions.length === 0) return;
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, suggestions.length - 1);
+                updateSuggestionSelection();
+                break;
+
+            case 'ArrowUp':
+                e.preventDefault();
+                selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+                updateSuggestionSelection();
+                break;
+
+            case 'Enter':
+                e.preventDefault();
+                if (selectedSuggestionIndex >= 0 && suggestions[selectedSuggestionIndex]) {
+                    selectSuggestion(suggestions[selectedSuggestionIndex]);
+                } else {
+                    hideSuggestions();
+                    performFilter();
+                }
+                break;
+
+            case 'Escape':
+                e.preventDefault();
+                hideSuggestions();
+                break;
+        }
+    }
+
+    // 防抖搜索建议
+    function debouncedFetchSuggestions(query) {
+        if (searchTimeout) {
+            clearTimeout(searchTimeout);
+        }
+
+        searchTimeout = setTimeout(() => {
+            fetchSuggestions(query);
+        }, 300);
     }
 
     // 执行筛选
@@ -387,16 +608,50 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 绑定事件
-    searchInput.addEventListener('input', performFilter);
+    searchInput.addEventListener('input', function() {
+        performFilter();
+        // 获取搜索建议
+        debouncedFetchSuggestions(this.value.trim());
+    });
+
     searchInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
+        // 处理搜索建议的键盘导航
+        handleSuggestionKeyboard(e);
+
+        // 原有的ESC清除功能（仅当建议框不可见时）
+        if (e.key === 'Escape' && searchSuggestions.classList.contains('hidden')) {
             clearSearch();
         }
     });
 
-    categoryFilter.addEventListener('change', performFilter);
-    clearButton.addEventListener('click', clearSearch);
-    clearAllButton.addEventListener('click', clearAllFilters);
+    // 搜索框获得焦点时，如果有内容则显示建议
+    searchInput.addEventListener('focus', function() {
+        if (this.value.trim()) {
+            debouncedFetchSuggestions(this.value.trim());
+        }
+    });
+
+    // 点击页面其他地方时隐藏建议
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+            hideSuggestions();
+        }
+    });
+
+    categoryFilter.addEventListener('change', function() {
+        performFilter();
+        hideSuggestions(); // 分类筛选时隐藏建议
+    });
+
+    clearButton.addEventListener('click', function() {
+        clearSearch();
+        hideSuggestions();
+    });
+
+    clearAllButton.addEventListener('click', function() {
+        clearAllFilters();
+        hideSuggestions();
+    });
 
     // 全局函数
     window.clearSearch = clearSearch;
