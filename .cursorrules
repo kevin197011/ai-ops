@@ -1,0 +1,936 @@
+# Cursor AI Assistant Rules - DevOps & Full Stack Development
+# ==================================================================
+# 适用于 DevOps、Ruby、Python、Go、前端开发的最佳实践规范
+# Version: 1.0
+# Last Updated: 2025-02-29
+
+## 🎯 总体原则
+- 遵循简洁、可读、可维护的代码原则
+- 优先考虑安全性和性能
+- 采用基础设施即代码(IaC)方法
+- 实施持续集成/持续部署(CI/CD)最佳实践
+- 编写全面的测试和文档
+- 使用语义化版本控制
+- 遵循12-Factor App原则
+- 交互都采用中文完成
+- 注释一律采用英文完成
+- 前端样式一律采用 Tailwind CSS 完成
+
+## 🔧 DevOps 最佳实践
+
+### Infrastructure as Code (IaC)
+- 使用 Terraform、Ansible、CloudFormation 等工具
+- 所有基础设施配置必须版本化
+- 环境配置应该是幂等的和可重复的
+- 使用模块化和可重用的配置
+```hcl
+# Terraform 示例结构
+resource "aws_instance" "example" {
+  ami           = var.ami_id
+  instance_type = var.instance_type
+
+  tags = {
+    Name        = "${var.project_name}-${var.environment}"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+```
+
+### 容器化和编排
+- 使用 Docker 进行容器化
+- 实施多阶段构建优化镜像大小
+- 使用 Kubernetes 或 Docker Compose 进行编排
+- 实施健康检查和资源限制
+```dockerfile
+# 多阶段构建示例
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+FROM node:18-alpine AS runtime
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY . .
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+CMD ["npm", "start"]
+```
+
+### CI/CD 流水线
+- 实施自动化测试、构建和部署
+- 使用蓝绿部署或滚动更新
+- 实施自动回滚机制
+- 集成安全扫描和代码质量检查
+```yaml
+# GitHub Actions 示例
+name: CI/CD Pipeline
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Tests
+        run: |
+          make test
+          make security-scan
+          make lint
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Production
+        run: make deploy-prod
+```
+
+### 监控和日志
+- 实施应用性能监控(APM)
+- 使用结构化日志
+- 设置告警和仪表板
+- 实施分布式链路追踪
+```json
+{
+  "timestamp": "2024-12-31T10:00:00Z",
+  "level": "info",
+  "service": "user-service",
+  "trace_id": "abc123",
+  "span_id": "def456",
+  "message": "User created successfully",
+  "user_id": "12345",
+  "duration_ms": 150
+}
+```
+
+## 🐍 Python 开发规范
+
+### 代码风格和结构
+- 遵循 PEP 8 和 PEP 257 规范
+- 使用 Black、isort、flake8 进行代码格式化
+- 采用类型提示(Type Hints)
+- 使用虚拟环境管理依赖
+```python
+from typing import List, Optional, Dict, Any
+from dataclasses import dataclass
+from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
+
+@dataclass
+class User:
+    """用户数据模型"""
+    id: int
+    name: str
+    email: str
+    created_at: datetime
+    metadata: Optional[Dict[str, Any]] = None
+
+class UserService:
+    """用户服务类"""
+
+    def __init__(self, db_connection: Any) -> None:
+        self.db = db_connection
+
+    async def create_user(self, user_data: Dict[str, Any]) -> User:
+        """创建新用户
+
+        Args:
+            user_data: 用户数据字典
+
+        Returns:
+            创建的用户对象
+
+        Raises:
+            ValueError: 当用户数据无效时
+        """
+        try:
+            # 验证输入数据
+            if not user_data.get('email'):
+                raise ValueError("Email is required")
+
+            # 创建用户逻辑
+            user = await self._create_user_in_db(user_data)
+            logger.info(f"User created successfully: {user.id}")
+            return user
+
+        except Exception as e:
+            logger.error(f"Failed to create user: {e}")
+            raise
+```
+
+### 依赖管理和项目结构
+```
+project/
+├── src/
+│   ├── __init__.py
+│   ├── models/
+│   ├── services/
+│   ├── api/
+│   └── utils/
+├── tests/
+├── docker/
+├── docs/
+├── pyproject.toml
+├── requirements.txt
+├── Dockerfile
+└── README.md
+```
+
+```toml
+# pyproject.toml
+[tool.poetry]
+name = "my-project"
+version = "0.1.0"
+description = "Project description"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.0"
+sqlalchemy = "^2.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+black = "^23.0.0"
+isort = "^5.12.0"
+mypy = "^1.6.0"
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.isort]
+profile = "black"
+```
+
+## 💎 Ruby 开发规范
+
+### 代码风格和结构
+- 遵循 Ruby Style Guide
+- 使用 RuboCop 进行代码检查
+- 采用语义化的方法和变量命名
+- 使用 Bundler 管理 Gem 依赖
+```ruby
+# frozen_string_literal: true
+
+require 'logger'
+
+module UserManagement
+  class UserService
+    attr_reader :logger, :repository
+
+    def initialize(repository:, logger: Logger.new($stdout))
+      @repository = repository
+      @logger = logger
+    end
+
+    # 创建新用户
+    # @param user_params [Hash] 用户参数
+    # @return [User] 创建的用户对象
+    # @raise [ArgumentError] 当参数无效时
+    def create_user(user_params)
+      validate_user_params!(user_params)
+
+      user = User.new(user_params)
+
+      if user.save
+        logger.info "User created successfully: #{user.id}"
+        user
+      else
+        logger.error "Failed to create user: #{user.errors.full_messages}"
+        raise ActiveRecord::RecordInvalid, user
+      end
+    rescue StandardError => e
+      logger.error "Unexpected error creating user: #{e.message}"
+      raise
+    end
+
+    private
+
+    def validate_user_params!(params)
+      raise ArgumentError, 'Email is required' if params[:email].blank?
+      raise ArgumentError, 'Name is required' if params[:name].blank?
+    end
+  end
+end
+```
+
+### Rails 最佳实践
+```ruby
+# Gemfile
+source 'https://rubygems.org'
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
+
+ruby '3.2.0'
+
+gem 'rails', '~> 7.1.0'
+gem 'pg', '~> 1.1'
+gem 'puma', '~> 6.0'
+gem 'redis', '~> 5.0'
+gem 'bootsnap', '>= 1.4.4', require: false
+
+group :development, :test do
+  gem 'rspec-rails', '~> 6.0'
+  gem 'factory_bot_rails', '~> 6.2'
+  gem 'rubocop', '~> 1.57', require: false
+  gem 'rubocop-rails', '~> 2.22', require: false
+  gem 'rubocop-rspec', '~> 2.25', require: false
+end
+
+group :development do
+  gem 'listen', '~> 3.8'
+  gem 'spring'
+end
+```
+
+## 🚀 Go 开发规范
+
+### 代码风格和结构
+- 遵循 Go 官方代码风格
+- 使用 gofmt、goimports、golint
+- 采用清晰的包结构和命名
+- 实施错误处理最佳实践
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "net/http"
+    "time"
+
+    "github.com/gin-gonic/gin"
+    "go.uber.org/zap"
+)
+
+// User 用户结构体
+type User struct {
+    ID        int       `json:"id" db:"id"`
+    Name      string    `json:"name" db:"name" validate:"required"`
+    Email     string    `json:"email" db:"email" validate:"required,email"`
+    CreatedAt time.Time `json:"created_at" db:"created_at"`
+}
+
+// UserService 用户服务接口
+type UserService interface {
+    CreateUser(ctx context.Context, user *User) error
+    GetUser(ctx context.Context, id int) (*User, error)
+}
+
+// UserRepository 用户仓储接口
+type UserRepository interface {
+    Save(ctx context.Context, user *User) error
+    FindByID(ctx context.Context, id int) (*User, error)
+}
+
+// userService 用户服务实现
+type userService struct {
+    repo   UserRepository
+    logger *zap.Logger
+}
+
+// NewUserService 创建用户服务
+func NewUserService(repo UserRepository, logger *zap.Logger) UserService {
+    return &userService{
+        repo:   repo,
+        logger: logger,
+    }
+}
+
+// CreateUser 创建用户
+func (s *userService) CreateUser(ctx context.Context, user *User) error {
+    if user == nil {
+        return fmt.Errorf("user cannot be nil")
+    }
+
+    // 验证用户数据
+    if err := s.validateUser(user); err != nil {
+        s.logger.Error("User validation failed",
+            zap.Error(err),
+            zap.String("email", user.Email))
+        return fmt.Errorf("validation failed: %w", err)
+    }
+
+    // 保存用户
+    user.CreatedAt = time.Now()
+    if err := s.repo.Save(ctx, user); err != nil {
+        s.logger.Error("Failed to save user",
+            zap.Error(err),
+            zap.String("email", user.Email))
+        return fmt.Errorf("failed to save user: %w", err)
+    }
+
+    s.logger.Info("User created successfully",
+        zap.Int("user_id", user.ID),
+        zap.String("email", user.Email))
+
+    return nil
+}
+
+func (s *userService) validateUser(user *User) error {
+    if user.Name == "" {
+        return fmt.Errorf("name is required")
+    }
+    if user.Email == "" {
+        return fmt.Errorf("email is required")
+    }
+    return nil
+}
+
+// HTTP 处理器
+func (s *userService) CreateUserHandler(c *gin.Context) {
+    var user User
+    if err := c.ShouldBindJSON(&user); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    ctx := c.Request.Context()
+    if err := s.CreateUser(ctx, &user); err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        return
+    }
+
+    c.JSON(http.StatusCreated, user)
+}
+```
+
+### 项目结构
+```
+project/
+├── cmd/
+│   └── server/
+│       └── main.go
+├── internal/
+│   ├── handler/
+│   ├── service/
+│   ├── repository/
+│   └── config/
+├── pkg/
+│   ├── logger/
+│   └── validator/
+├── api/
+│   └── openapi.yaml
+├── deployments/
+├── scripts/
+├── go.mod
+├── go.sum
+├── Dockerfile
+└── README.md
+```
+
+## 🌐 前端开发规范
+
+### React/TypeScript 最佳实践
+```typescript
+// React 组件示例
+import React, { useState, useEffect, useCallback } from 'react';
+import { User, UserService } from '../services/UserService';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { ErrorMessage } from '../components/ErrorMessage';
+
+interface UserListProps {
+  className?: string;
+  onUserSelect?: (user: User) => void;
+}
+
+interface UserListState {
+  users: User[];
+  loading: boolean;
+  error: string | null;
+}
+
+export const UserList: React.FC<UserListProps> = ({
+  className,
+  onUserSelect
+}) => {
+  const [state, setState] = useState<UserListState>({
+    users: [],
+    loading: true,
+    error: null,
+  });
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      const users = await UserService.getUsers();
+      setState(prev => ({ ...prev, users, loading: false }));
+    } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'Failed to fetch users';
+      setState(prev => ({
+        ...prev,
+        error: errorMessage,
+        loading: false
+      }));
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  const handleUserClick = useCallback((user: User) => {
+    onUserSelect?.(user);
+  }, [onUserSelect]);
+
+  if (state.loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (state.error) {
+    return (
+      <ErrorMessage
+        message={state.error}
+        onRetry={fetchUsers}
+      />
+    );
+  }
+
+  return (
+    <div className={`user-list ${className || ''}`}>
+      <h2>Users</h2>
+      <ul className="user-list__items">
+        {state.users.map((user) => (
+          <li
+            key={user.id}
+            className="user-list__item"
+            onClick={() => handleUserClick(user)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleUserClick(user);
+              }
+            }}
+          >
+            <span className="user-list__name">{user.name}</span>
+            <span className="user-list__email">{user.email}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+// 默认导出
+export default UserList;
+```
+
+### CSS/SCSS 规范
+```scss
+// variables.scss
+:root {
+  --color-primary: #007bff;
+  --color-secondary: #6c757d;
+  --color-success: #28a745;
+  --color-danger: #dc3545;
+  --color-warning: #ffc107;
+  --color-info: #17a2b8;
+
+  --font-family-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-base: 1rem;
+  --line-height-base: 1.5;
+
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 3rem;
+}
+
+// 组件样式
+.user-list {
+  padding: var(--spacing-md);
+  background-color: var(--color-white);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &__items {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-md) 0 0;
+  }
+
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover,
+    &:focus {
+      background-color: var(--color-gray-50);
+      outline: none;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__name {
+    font-weight: 600;
+    color: var(--color-gray-900);
+  }
+
+  &__email {
+    color: var(--color-gray-600);
+    font-size: 0.875rem;
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .user-list {
+    padding: var(--spacing-sm);
+
+    &__item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-xs);
+    }
+  }
+}
+```
+
+### 构建和配置
+```json
+// package.json
+{
+  "name": "frontend-app",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vitejs/plugin-react": "^4.1.0",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.4",
+    "typescript": "^5.2.2",
+    "vite": "^4.5.0",
+    "vitest": "^0.34.6"
+  }
+}
+```
+
+## 🔒 安全最佳实践
+
+### 通用安全原则
+- 永远不要在代码中硬编码密钥或敏感信息
+- 使用环境变量管理配置
+- 实施输入验证和输出编码
+- 使用 HTTPS 和安全头
+- 实施适当的身份验证和授权
+- 定期更新依赖项
+- 实施安全代码审查
+
+```bash
+# .env 示例
+DATABASE_URL=postgresql://user:password@localhost:5432/myapp
+REDIS_URL=redis://localhost:6379/0
+JWT_SECRET=your-super-secret-jwt-key
+API_KEY=your-api-key
+ENVIRONMENT=development
+LOG_LEVEL=info
+```
+
+```yaml
+# 安全扫描 CI/CD
+security-scan:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+    - name: Run SAST scan
+      uses: github/codeql-action/analyze@v2
+```
+
+## 📝 文档和注释规范
+
+### 代码注释
+- 为复杂逻辑添加解释性注释
+- 使用文档字符串描述函数和类
+- 包含参数、返回值和异常信息
+- 保持注释与代码同步
+
+### 项目文档
+```markdown
+# Project Name
+
+## Overview
+Brief description of the project and its purpose.
+
+## Quick Start
+```bash
+# Clone the repository
+git clone https://github.com/username/project.git
+
+# Install dependencies
+make install
+
+# Start development server
+make dev
+```
+
+## Architecture
+- Overview of system architecture
+- Component relationships
+- Data flow diagrams
+
+## API Documentation
+- OpenAPI/Swagger specifications
+- Authentication methods
+- Rate limiting
+
+## Deployment
+- Environment requirements
+- Configuration options
+- Deployment procedures
+
+## Contributing
+- Code style guidelines
+- Pull request process
+- Testing requirements
+```
+
+## 🧪 测试策略
+
+### 测试金字塔
+- 单元测试：70%
+- 集成测试：20%
+- 端到端测试：10%
+
+```python
+# Python 测试示例
+import pytest
+from unittest.mock import Mock, AsyncMock
+from src.services.user_service import UserService
+
+class TestUserService:
+    @pytest.fixture
+    def mock_repository(self):
+        return Mock()
+
+    @pytest.fixture
+    def user_service(self, mock_repository):
+        return UserService(mock_repository)
+
+    @pytest.mark.asyncio
+    async def test_create_user_success(self, user_service, mock_repository):
+        # Arrange
+        user_data = {"name": "John Doe", "email": "john@example.com"}
+        mock_repository.save.return_value = AsyncMock()
+
+        # Act
+        result = await user_service.create_user(user_data)
+
+        # Assert
+        assert result.name == "John Doe"
+        assert result.email == "john@example.com"
+        mock_repository.save.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_create_user_invalid_email(self, user_service):
+        # Arrange
+        user_data = {"name": "John Doe", "email": ""}
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Email is required"):
+            await user_service.create_user(user_data)
+```
+
+## ⚡ 性能优化指导
+
+### 数据库优化
+- 使用适当的索引
+- 实施查询优化
+- 使用连接池
+- 实施缓存策略
+
+### 应用性能
+- 实施异步处理
+- 使用适当的数据结构
+- 避免 N+1 查询问题
+- 实施内存和CPU监控
+
+### 前端性能
+- 代码分割和懒加载
+- 图片优化和压缩
+- 使用CDN
+- 实施缓存策略
+- 性能监控和分析
+
+## 📊 监控和日志
+
+### 应用监控
+```python
+# Python 监控示例
+import logging
+import time
+from functools import wraps
+from prometheus_client import Counter, Histogram
+
+# 指标定义
+REQUEST_COUNT = Counter('app_requests_total', 'Total requests', ['method', 'endpoint'])
+REQUEST_LATENCY = Histogram('app_request_duration_seconds', 'Request latency')
+
+def monitor_performance(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        start_time = time.time()
+        try:
+            result = await func(*args, **kwargs)
+            REQUEST_COUNT.labels(method='POST', endpoint='/users').inc()
+            return result
+        except Exception as e:
+            logging.error(f"Error in {func.__name__}: {e}")
+            raise
+        finally:
+            REQUEST_LATENCY.observe(time.time() - start_time)
+    return wrapper
+```
+
+## 🚀 部署和发布
+
+### 版本控制
+- 使用语义化版本控制 (SemVer)
+- 标记重要的发布版本
+- 维护变更日志
+
+### 部署策略
+- 蓝绿部署
+- 滚动更新
+- 金丝雀发布
+- 特性开关
+
+```yaml
+# Kubernetes 部署示例
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: app
+        image: myapp:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: database-url
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+```
+
+## 📋 代码审查清单
+
+### 通用检查项
+- [ ] 代码遵循项目风格指南
+- [ ] 所有测试通过
+- [ ] 无安全漏洞
+- [ ] 性能考虑得当
+- [ ] 错误处理完善
+- [ ] 日志记录适当
+- [ ] 文档更新完整
+
+### 特定语言检查项
+
+#### Python
+- [ ] 遵循 PEP 8 规范
+- [ ] 使用类型提示
+- [ ] 适当的异常处理
+- [ ] 资源管理(with语句)
+
+#### Ruby
+- [ ] 遵循 Ruby Style Guide
+- [ ] 适当的元编程使用
+- [ ] 正确的异常处理
+- [ ] 内存和性能考虑
+
+#### Go
+- [ ] 遵循 Go 惯例
+- [ ] 适当的错误处理
+- [ ] 并发安全性
+- [ ] 内存泄漏检查
+
+#### 前端
+- [ ] 组件可复用性
+- [ ] 性能优化
+- [ ] 可访问性
+- [ ] 响应式设计
+- [ ] SEO考虑
+
+---
+
+*此 .cursorrules 文件应根据项目需求和团队标准进行定制和更新*
